@@ -1,0 +1,12 @@
+---
+- name: Find all EC2 instances
+  ec2_instance_facts:
+    region: "{{ aws_region }}"
+  register: ec2
+- debug: var=ec2
+- name: "{{ 'Create' if (state is undefined or 'absent' not in state) else 'Terminate' }} RHSM Registration"
+  redhat_subscription:
+    state: absent
+  delegate_to: "{{ item.private_dns_name }}"
+  with_items:
+    - "{{ ec2.instances }}"

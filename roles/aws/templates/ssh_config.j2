@@ -1,0 +1,30 @@
+Host aws-{{ clusterid }}-bastion
+  HostName                 {{ eipbastion.public_ip }}
+  User                     ec2-user
+  StrictHostKeyChecking    no
+  ProxyCommand             none
+  CheckHostIP              no
+  ForwardAgent             yes
+  ServerAliveInterval      15
+  TCPKeepAlive             yes
+  ControlMaster            auto
+  ControlPath              ~/.ssh/mux-%r@%h:%p
+  ControlPersist           15m
+  ServerAliveInterval      30
+  IdentityFile             ~/.ssh/{{ clusterid }}.{{ dns_domain }}
+
+Host *.compute.internal
+  ProxyCommand             ssh -W %h:%p aws-{{ clusterid }}-bastion
+  user                     ec2-user
+  StrictHostKeyChecking    no
+  CheckHostIP              no
+  ServerAliveInterval      30
+  IdentityFile             ~/.ssh/{{ clusterid }}.{{ dns_domain }}
+
+Host *.ec2.internal
+  ProxyCommand             ssh -W %h:%p aws-{{ clusterid }}-bastion
+  user                     ec2-user
+  StrictHostKeyChecking    no
+  CheckHostIP              no
+  ServerAliveInterval      30
+  IdentityFile             ~/.ssh/{{ clusterid }}.{{ dns_domain }}

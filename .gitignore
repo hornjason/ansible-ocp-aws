@@ -1,0 +1,5 @@
+**.env
+**hosts
+*.retry
+vars.yml
+**.log

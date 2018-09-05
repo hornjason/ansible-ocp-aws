@@ -1,0 +1,146 @@
+---
+aws_cred_profile: "chc"
+
+# password for ssh key - ~/.ssh/{{ clusterid }}.{{ dns_domain }}
+#sshkey_password: 'abc123'
+#ec2_keypair: demo
+
+clusterid: "awscluster"
+dns_domain: "example.com"
+aws_region: "us-east-1"
+
+# Registered dns_domain in route53
+aws_route53: False
+
+# When your user has AWS admin rights this will create
+# separate users and access_keys for CloudProvider & S3
+aws_admin_rights: False
+# AWS Access keys if aws_admin_rights: false
+aws_access_key_id: "{{ lookup('env','AWS_ACCESS_KEY_ID') }}"
+aws_secret_access_key: "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
+
+vpc_cidr: "172.19.0.0/16"
+
+subnets_public_cidr:
+  - 172.19.0.0/24
+  - 172.19.1.0/24
+  - 172.19.2.0/24
+
+subnets_private_cidr:
+  - 172.19.16.0/20
+  - 172.19.32.0/20
+  - 172.19.48.0/20
+
+# Recommended sizing
+ec2_count_master: 3
+ec2_count_infra: 3
+ec2_count_node: 3
+ec2_count_cns: 3
+
+ec2_type_bastion: "t2.medium"
+ec2_type_master: "m5.xlarge"
+ec2_type_infra: "m5.xlarge"
+ec2_type_node: "m5.4xlarge"
+ec2_type_cns: "t2.xlarge"
+# Testing
+#ec2_type_master: "t2.large"
+#ec2_type_infra: "t2.xlarge"
+#ec2_type_node: "t2.large"
+#ec2_type_cns: "r5.large"
+
+rhel_release: "rhel-7.5"
+
+# If not set will find the correct images using getec2ami.yml task
+# Set this to use a different image
+#ec2ami: ami-03291866
+
+#######################
+# RHSM
+# Username / Password or
+# Activation key / OrgId
+#######################
+#rhsm_user: ""
+#rhsm_pass: ""
+#rhsm_key: ""
+#rhsm_org: ""
+# Can specify separate pools so only Application nodes use paid subs
+# or keep the same if only using one pool
+rhsm_broker_pool: ""
+rhsm_node_pool: ""
+# For Openshift Container Storage
+rhsm_ocs_pool: ""
+rhsm_repos:
+  - rhel-7-server-rpms
+  - rhel-7-server-extras-rpms
+  - rhel-7-server-ose-3.10-rpms
+  - rhel-7-fast-datapath-rpms
+  - rhel-7-server-ansible-2.4-rpms
+bastion_pkgs:
+  - ansible
+  - atomic-openshift-clients
+  - git
+  - tmux
+  - screen
+  - nmap-ncat
+
+
+###################################
+###################################
+# Openshift Configuration
+###################################
+
+###################################
+# Custom Named Certs
+###################################
+# Router
+# fullchain: consists of domain.crt + CA
+# cafile: ca or bundle
+router_cert: {"certfile": "/path/to/fullchain.crt", "keyfile": "/path/to/dns_domain.key", "cafile": "/path/to/ca or intermediate.crt"}
+###################################
+# Master
+###################################
+master_cert: [{"certfile": "/path/to/fullchain.crt", "keyfile": "/path/to/dns_domain.key", "names": ["{{ master_lb_dns }}m"], "cafile": "/path/to/ca or intermediate.crt"}]
+
+#######################
+# LB
+#######################
+# DNS that resolves to Master LB
+master_lb_dns: "console.{{ dns_domain }}"
+
+# DNS that resolves to infra LB
+# default subdomain to use for exposed routes, you should have wildcard dns
+# for *.apps.test.example.com that points at your infra nodes which will run
+# your router
+router_lb_default_subdomain: "apps.{{ dns_domain }}"
+
+
+#######################
+# OCP Identity
+# Use 'htpasswd -n <user>' to generate password hash. (htpasswd from httpd-tools RPM)
+#######################
+# Example with admin:changeme
+openshift_master_htpasswd_users: {'admin': '$apr1$zAhyA9Ko$rBxBOwAwwtRuuaw8OtCwH0'}
+openshift_master_identity_providers: [{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+###################################
+# Logging  / Metrics
+###################################
+# for best practices run through
+# https://github.com/red-hat-storage/openshift-cic
+deploy_metrics: True
+metrics_volume_size: '25Gi'
+
+deploy_logging: True
+logging_volume_size: '25Gi'
+
+deploy_prometheus: True
+deploy_grafana: True
+
+deploy_cns: False
+
+deploy_service_catalog: True
+deploy_template_service_broker: True
+
+###################################
+# Networking
+os_sdn_network_plugin_name: 'redhat/openshift-ovs-multitenant'
