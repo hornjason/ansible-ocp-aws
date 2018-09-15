@@ -30,7 +30,6 @@ VM sizes can be configured from defaults by changing the following variables, if
 | vm_size_master: | Standard_D4s_v3
 | vm_size_infra: | Standard_D4s_v3
 | vm_size_node:  | Standard_D2s_v3
-| vm_size_cns:   |   Standard_D8s_v3
 | vm_size_bastion: | Standard_D1
 
 
@@ -76,6 +75,8 @@ A few Pre-Reqs need to be met and are documented in the Reference Architecture a
   ```
  7. Fill out required variables below.
  8. Due to bug https://github.com/ansible/ansible/issues/40332 if the ansible control host used to deploy from has LANG set to something other than `en` then you must  `unset LANG`
+ 9. Due to bug https://github.com/openshift/openshift-ansible/pull/9971, 2 OCS registries will fail to install unless you clone https://github.com/openshift/openshift-ansible.git 
+ - cd /usr/share/ansible/; mv openshift-ansible openshift-ansible-rpm; git clone https://github.com/openshift/openshift-ansible.git; cd -
 
 ## Required Variables
 Most defaults are specified in `role/aws/defaults/main.yml`,  Sensitive information is left out and should be entered in `vars.yml`.  Below are required variables that should be filled in before deploying.
@@ -100,7 +101,6 @@ Number of Nodes
  - **master_nodes**: Defaults to 3 
  - **infra_nodes**:  Defaults to 3 
  - **app_nodes**:    Defaults to 3 
- - **cns_nodes**:    Defaults to 3 -> depending on how many app nodes this will be 2 OCS Clusters.  1 Infra OCS cluster and 1 App OCS cluster.
 
 Optional Variables:
 
