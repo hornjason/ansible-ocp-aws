@@ -51,7 +51,7 @@ A few Pre-Reqs need to be met and are documented in the Reference Architecture a
     sudo subscription-manager repos \
     --enable="rhel-7-server-rpms" \
     --enable="rhel-7-server-extras-rpms" \
-    --enable="rhel-7-server-ose-3.9-rpms" \
+    --enable="rhel-7-server-ose-3.10-rpms" \
     --enable="rhel-7-fast-datapath-rpms" \
     --enable="rhel-7-server-ansible-2.5-rpms"
 
@@ -67,14 +67,13 @@ A few Pre-Reqs need to be met and are documented in the Reference Architecture a
  ```
  ansible-playbook aws-cli.yml
  ```
- 4. Authenticate with AWS,  
- 6. Copy vars.yml.example to vars.yml
+ 4. Copy vars.yml.example to vars.yml
   ```
   cp vars.yml.example vars.yml 
   ```
- 7. Fill out required variables below.
- 8. Due to bug https://github.com/ansible/ansible/issues/40332 if the ansible control host used to deploy from has LANG set to something other than `en` then you must  `unset LANG`
- 9. Due to bug https://github.com/openshift/openshift-ansible/pull/9971, 2 OCS registries will fail to install unless you clone https://github.com/openshift/openshift-ansible.git 
+ 5. Fill out required variables below.
+ 6. Due to bug https://github.com/ansible/ansible/issues/40332 if the ansible control host used to deploy from has LANG set to something other than `en` then you must  `unset LANG`
+ 7. Due to bug https://github.com/openshift/openshift-ansible/pull/9971, 2 OCS registries will fail to install unless you clone https://github.com/openshift/openshift-ansible.git 
 ```
 cd /usr/share/ansible/; mv openshift-ansible openshift-ansible-rpm; git clone https://github.com/openshift/openshift-ansible.git; cd -
 ```
