@@ -85,10 +85,8 @@ aws_region: "us-east-1"
 
  - **aws_region**:  - AWS location for deployment ex. `us-east-1`
  - **clusterid**:  - Azure Resource Group ex. `test-rg`
+ - **vpc_cidr**: - Can customize as needed, ex `"10.0.0.0/16"`
  - **admin_user**: - SSH user that will be created on each VM ex. `cloud-user`
- - **admin_pubkey**: - Copy paste the Public SSH key that will be added to authorized_keys on each VM ex.
- `ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAB`
- - **admin_privkey**: - Path to the private ssh key associated with the public key above.  ex. `'~/.ssh/id_rsa`
  - **rhsm_user**: - If subscribing to RHSM using username / password, fill in username
  - **rhsm_pass**: - If subscribing to RHSM using username / password, fill in passowrd for RHSM 
  - **rhsm_key**: -  If subscribing to RHSM using activation key and orgId fill in activation key here.
@@ -102,8 +100,7 @@ Number of Nodes
  - **app_nodes**:    Defaults to 3 
 
 Optional Variables:
-
- - **vnet_cidr**: - Can customize as needed, ex `"10.0.0.0/16"`
+ 
 By Default the HTPasswdPasswordIdentityProvider is used but can be customized,  this will be templated out to the ansible hosts file.  By default htpasswd user is added.
 - **openshift_master_htpasswd_users**: - Contains the user: < passwd hash generated from htpasswd -n user >
 - **deploy_cns**: true
@@ -111,6 +108,7 @@ By Default the HTPasswdPasswordIdentityProvider is used but can be customized,  
 - **deploy_metrics**: true
 - **deploy_logging**: true
 - **deploy_prometheus**: true
+- **deploy_grafana**: true
 - **metrics_volume_size**: '20Gi'
 - **logging_volume_size**: '100Gi'
 - **prometheus_volume_size**: '20Gi'
