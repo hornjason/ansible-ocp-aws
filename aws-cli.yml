@@ -2,6 +2,7 @@
   hosts: localhost
   become: true
   vars:
+    home_dir: "{{ lookup('env', 'HOME') }}"
     rhsm_repos:
       - rhel-7-server-rpms
       - rhel-7-server-extras-rpms
@@ -13,7 +14,6 @@
       - rhel-7-server-ose-3.9-rpms
     message: |
       This host is now setup, next steps are
-        Login
         Copy vars.yml.example to vars.yml
         - cp vars.yml.example vars.yml
         Edit vars.yml
@@ -30,20 +30,6 @@
         name: "{{ rhsm_repos }}" 
         state: enabled 
 
-    - name: Setup | Import Microsft RPM key 
-      rpm_key: 
-        state: present 
-        key: https://packages.microsoft.com/keys/microsoft.asc 
-        
-    - name: Setup | Check for exisiting Microsoft yum repo 
-      stat: 
-        path: /etc/yum.repos.d/azure-cli.repo 
-      register: repo_check 
-    
-    - name: Setup | Install CLI yum repo 
-      shell: sh -c 'echo -e "[azure-cli]\nname=Azure CLI\nbaseurl=https://packages.microsoft.com/yumrepos/azure-cli\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/azure-cli.repo' 
-      when: not repo_check.stat.exists 
-      
     - name: Setup | Install required packages 
       yum: 
         name: "{{ item }}" 
@@ -51,7 +37,6 @@
       loop: 
         - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm 
         - python2-pip 
-        - azure-cli
         - atomic-openshift-clients
         - openshift-ansible
         - python-devel
@@ -67,8 +52,29 @@
         name: "{{ item }}"
       loop:
         - boto3
+        - boto
+        - awscli
 
-    - name: Setup | Prompt
-      debug:
-        msg: "{{ message.split('\n') }}"
-
+    - name: 'Create the AWS config directory'
+      file:
+        path: "{{ home_dir }}/.aws"
+        state: directory
+        mode: 0755
+ 
+    - name: 'Copy AWS CLI config'
+      template:
+        src: aws_cli_config.j2
+        dest: "{{ home_dir }}/.aws/config"
+        mode: 0600
+ 
+    - name: 'Copy AWS CLI credentials'
+      tags: 'aws-cli'
+      template:
+        src: aws_cli_credentials.j2
+        dest: "{{ home_dir }}/.aws/credentials"
+        mode: 0600
+ 
+     - name: Setup | Prompt
+       debug:
+         msg: "{{ message.split('\n') }}"
+ 

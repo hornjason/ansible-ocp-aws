@@ -1,0 +1,28 @@
+---
+- hosts: localhost
+  vars:
+    ssh_config_file: "{{ lookup('env', 'HOME') }}/.ssh/config-{{ clusterid }}.{{ dns_domain }}"
+    message: |
+      Export the following Variables to switch between multiple clusters
+      - export CLUSTERID={{ clusterid }}
+      - export CLUSTERDOMAIN={{ dns_domain }}
+  vars_files:
+    - "./vars.yml"
+  tasks:
+    - name: Ensure {{ ssh_config_file }} exists
+      file:
+        path: "{{ ssh_config_file }}"
+      register: ssh_config
+
+    - name: Switch ansible.cfg to correct cluster
+      lineinfile:
+        path: "ansible.cfg"
+        regexp: "^ssh_args"
+        line: "ssh_args = -F {% raw %}{{ lookup('env', 'HOME') }}/.ssh/config-{{ lookup('env','CLUSTERID') }}.{{ lookup('env', 'CLUSTERDOMAIN') }} -C -o ControlMaster=auto -o StrictHostKeyChecking=no -o ControlPersist=120s -o GSSAPIAuthentication=no -o PreferredAuthentications=publickey {% endraw %}"
+  
+    - name: Alias ssh to use {{ ssh_config_file }}
+      lineinfile:
+        path: ~/.bashrc
+        line: alias ssh='ssh -F ~/.ssh/config-${CLUSTERID}.${CLUSTERDOMAIN}'
+
+    - debug: msg="{{ message.split('\n') }}"

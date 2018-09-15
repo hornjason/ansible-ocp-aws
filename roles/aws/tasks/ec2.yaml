@@ -164,7 +164,8 @@
     exact_count: "{{ 1 if (state is undefined or 'absent' not in state) else 0 }}"
     group: [
       "infra",
-      "node"
+      "node",
+      "cns"
     ]
     instance_type: "{{ item.type }}"
     image: "{{ ec2ami }}"
@@ -183,6 +184,9 @@
         volume_type: gp2
         volume_size: 100
       - device_name: /dev/xvdc
+        volume_type: gp2
+        volume_size: 100
+      - device_name: /dev/xvdd
         volume_type: gp2
         volume_size: 100
     vpc_subnet_id: "{{ item.subnet }}"
@@ -249,6 +253,14 @@
   when:
     - ( state is undefined ) or ( 'absent' not in state )
 
+- include_tasks: tag.yaml
+  vars:
+    - resource: "{{ item.tagged_instances[0].block_device_mapping['/dev/xvdd'].volume_id }}"
+    - tagss: "Name={{ item.tagged_instances[0].id }}-xvdd-brick, clusterid={{ clusterid }}, "
+  with_items: "{{ ec2infra.results }}"
+  when:
+    - ( state is undefined ) or ( 'absent' not in state )
+
 - name: "{{ 'Create' if (state is undefined or 'absent' not in state) else 'Terminate' }} EC2 instances ( App )"
   ec2:
     assign_public_ip: no
@@ -256,7 +268,8 @@
       Name: "{{ item.name }}"
     exact_count: "{{ 1 if (state is undefined or 'absent' not in state) else 0 }}"
     group: [
-      "node"
+      "node",
+      "cns"
     ]
     instance_type: "{{ item.type }}"
     image: "{{ ec2ami }}"
@@ -275,6 +288,9 @@
         volume_type: gp2
         volume_size: 100
       - device_name: /dev/xvdc
+        volume_type: gp2
+        volume_size: 100
+      - device_name: /dev/xvdd
         volume_type: gp2
         volume_size: 100
     vpc_subnet_id: "{{ item.subnet }}"
@@ -337,6 +353,14 @@
   vars:
     - resource: "{{ item.tagged_instances[0].block_device_mapping['/dev/xvdc'].volume_id }}"
     - tagss: "Name={{ item.tagged_instances[0].id }}-xvdc, clusterid={{ clusterid }}, "
+  with_items: "{{ ec2node.results }}"
+  when:
+    - ( state is undefined ) or ( 'absent' not in state )
+
+- include_tasks: tag.yaml
+  vars:
+    - resource: "{{ item.tagged_instances[0].block_device_mapping['/dev/xvdd'].volume_id }}"
+    - tagss: "Name={{ item.tagged_instances[0].id }}-xvdd-brick, clusterid={{ clusterid }}, "
   with_items: "{{ ec2node.results }}"
   when:
     - ( state is undefined ) or ( 'absent' not in state )

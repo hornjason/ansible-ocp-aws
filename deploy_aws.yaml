@@ -2,7 +2,7 @@
 - hosts: localhost
   become: False
   vars_files:
-    - vars/main.yaml
+    - "./vars.yml"
   tasks:
     - import_tasks: roles/aws/tasks/getcreds.yaml
     - import_tasks: roles/aws/tasks/getazs.yaml
@@ -23,7 +23,9 @@
     - import_tasks: roles/aws/tasks/routetable.yaml
     - import_tasks: roles/aws/tasks/routetablerule.yaml
     - import_tasks: roles/aws/tasks/securitygroup.yaml
+    - import_tasks: roles/aws/tasks/securitygroup_cns.yaml
     - import_tasks: roles/aws/tasks/securitygrouprule.yaml
+    - import_tasks: roles/aws/tasks/securitygrouprule_cns.yaml
     - import_tasks: roles/aws/tasks/elb.yaml
     - import_tasks: roles/aws/tasks/ec2.yaml
     - import_tasks: roles/aws/tasks/eip.yaml
@@ -32,3 +34,6 @@
       when: ( aws_route53 | bool ) and ( aws_route53 is defined )
     - import_tasks: roles/aws/tasks/configfiles.yaml
     - import_tasks: roles/aws/tasks/configfilesdata.yaml
+     
+- name: Configuring SSH for this environment
+  import_playbook: configure_ssh_proxy.yml 

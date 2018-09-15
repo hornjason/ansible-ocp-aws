@@ -5,6 +5,7 @@
     dns_name: "{{ dns_domain }}"
     query: hosted_zone
   register: r53_zones
+  #when: aws_route53 | bool and aws_route53 is defined
 
 #{%- if clusterid ~ "." ~ dns_domain ~ "." in zone.Name -%}
 - name: Filter Route53 zones
@@ -17,19 +18,25 @@
         {%- endif -%}
       {% endfor -%}']
   register: r53_zones
-  when: "r53_zones.HostedZones | length > 0"
+  when:
+    - r53_zones.HostedZones | length > 0 and r53_zones is defined
+    - aws_route53 | bool and aws_route53 is defined
 
 - name: Fetch SOA records Route53 public zone
   set_fact:
     ns: "{{ lookup('route53_namservers', args).split(',') }}"
   vars:
     - args: ['{ "id": "{{ r53_zones[0].Id }}" } ']
-  when: "r53_zones | length == 1"
+  when:
+    - r53_zones | length == 1
+    - aws_route53 | bool and aws_route53 is defined
 
 - debug:
     msg:
       - 'Error in env; AWS Route53 public zone for {{ clusterid }} is not available.  Please rerun this play!'
-  when: "( vpc_subnet_azs | length | int ) < 3"
+  when:
+    - ( vpc_subnet_azs | length | int ) < 3
+    - aws_route53 | bool and aws_route53 is defined
   failed_when: "r53_zones.HostedZones | length != 1"
 
 - name: "Land file content (clusterid domain delegation)"
@@ -38,6 +45,7 @@
     marker: "#<!-- {mark} OUTPUT -->"
     content: |
       {{ lookup('template', ( playbook_dir + '/roles/aws/templates/outputdomaindeleg.j2') ) }}
+  when: aws_route53 | bool and aws_route53 is defined
 
 - name: "Land openshift-ansible installer cloudprovider_kind and credentials"
   blockinfile:

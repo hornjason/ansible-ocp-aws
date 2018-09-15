@@ -1,55 +1,52 @@
 ---
-aws_cred_profile: "chc"
+#aws_cred_profile: "chc"
 
 # password for ssh key - ~/.ssh/{{ clusterid }}.{{ dns_domain }}
 #sshkey_password: 'abc123'
 #ec2_keypair: demo
 
+#######################
+# AWS 
+#######################
 clusterid: "awscluster"
-dns_domain: "example.com"
-aws_region: "us-east-1"
+dns_domain: "change.me"
+aws_region: "us-east-2"
+aws_output_format: json
+aws_access_key: "{{ lookup('env','AWS_ACCESS_KEY_ID') }}"
+aws_secret_key: "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
 
-# Registered dns_domain in route53
-aws_route53: False
-
-# When your user has AWS admin rights this will create
-# separate users and access_keys for CloudProvider & S3
+#######################
+# AWS ADMIN RIGHTS
+#######################
+# True: you have admin rights, separate users and access_keys for CloudProvider & S3
+# False: will use one access_key for everything  
 aws_admin_rights: False
-# AWS Access keys if aws_admin_rights: false
-aws_access_key_id: "{{ lookup('env','AWS_ACCESS_KEY_ID') }}"
-aws_secret_access_key: "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
 
-vpc_cidr: "172.19.0.0/16"
-
-subnets_public_cidr:
-  - 172.19.0.0/24
-  - 172.19.1.0/24
-  - 172.19.2.0/24
-
-subnets_private_cidr:
-  - 172.19.16.0/20
-  - 172.19.32.0/20
-  - 172.19.48.0/20
+#######################
+# AWS Route53 
+#######################
+# Registered dns_domain in route53
+# NOTE: domain needs to be registerd in AWS before
+aws_route53: True
 
 # Recommended sizing
 ec2_count_master: 3
 ec2_count_infra: 3
 ec2_count_node: 3
-ec2_count_cns: 3
 
-ec2_type_bastion: "t2.medium"
-ec2_type_master: "m5.xlarge"
-ec2_type_infra: "m5.xlarge"
-ec2_type_node: "m5.4xlarge"
-ec2_type_cns: "t2.xlarge"
+#ec2_type_bastion: "t2.medium"
+#ec2_type_master: "m5.xlarge"
+#ec2_type_infra: "m5.xlarge"
+#ec2_type_node: "m5.4xlarge"
 # Testing
-#ec2_type_master: "t2.large"
-#ec2_type_infra: "t2.xlarge"
-#ec2_type_node: "t2.large"
-#ec2_type_cns: "r5.large"
+ec2_type_bastion: "t2.medium"
+ec2_type_master: "t2.large"
+ec2_type_infra: "t2.xlarge"
+ec2_type_node: "t2.large"
 
+#######################
+# RHEL IMAGE
 rhel_release: "rhel-7.5"
-
 # If not set will find the correct images using getec2ami.yml task
 # Set this to use a different image
 #ec2ami: ami-03291866
@@ -59,15 +56,15 @@ rhel_release: "rhel-7.5"
 # Username / Password or
 # Activation key / OrgId
 #######################
-#rhsm_user: ""
-#rhsm_pass: ""
-#rhsm_key: ""
-#rhsm_org: ""
+rhsm_user: ""
+rhsm_pass: ""
+rhsm_key: ""
+rhsm_org: ""
 # Can specify separate pools so only Application nodes use paid subs
 # or keep the same if only using one pool
 rhsm_broker_pool: ""
 rhsm_node_pool: ""
-# For Openshift Container Storage
+# If deploy_cns is true this pool should have access to rpms
 rhsm_ocs_pool: ""
 rhsm_repos:
   - rhel-7-server-rpms
@@ -90,16 +87,34 @@ bastion_pkgs:
 ###################################
 
 ###################################
+# Networking
+###################################
+vpc_cidr: "172.16.0.0/16"
+
+subnets_public_cidr:
+  - 172.16.0.0/24
+  - 172.16.1.0/24
+  - 172.16.2.0/24
+
+subnets_private_cidr:
+  - 172.16.16.0/20
+  - 172.16.32.0/20
+  - 172.16.48.0/20
+
+os_sdn_network_plugin_name: 'redhat/openshift-ovs-multitenant'
+#openshift_portal_net:
+#osm_cluster_network_cidr:
+###################################
 # Custom Named Certs
 ###################################
 # Router
 # fullchain: consists of domain.crt + CA
 # cafile: ca or bundle
-router_cert: {"certfile": "/path/to/fullchain.crt", "keyfile": "/path/to/dns_domain.key", "cafile": "/path/to/ca or intermediate.crt"}
+#router_cert: {"certfile": "/path/to/fullchain.crt", "keyfile": "/path/to/dns_domain.key", "cafile": "/path/to/ca or intermediate.crt"}
 ###################################
 # Master
 ###################################
-master_cert: [{"certfile": "/path/to/fullchain.crt", "keyfile": "/path/to/dns_domain.key", "names": ["{{ master_lb_dns }}m"], "cafile": "/path/to/ca or intermediate.crt"}]
+#master_cert: [{"certfile": "/path/to/fullchain.crt", "keyfile": "/path/to/dns_domain.key", "names": ["{{ master_lb_dns }}m"], "cafile": "/path/to/ca or intermediate.crt"}]
 
 #######################
 # LB
@@ -127,20 +142,29 @@ openshift_master_identity_providers: [{'name': 'htpasswd_auth', 'login': 'true',
 ###################################
 # for best practices run through
 # https://github.com/red-hat-storage/openshift-cic
+deploy_service_catalog: True
+deploy_template_service_broker: True
+deploy_cns: True
 deploy_metrics: True
-metrics_volume_size: '25Gi'
-
 deploy_logging: True
-logging_volume_size: '25Gi'
-
 deploy_prometheus: True
 deploy_grafana: True
 
-deploy_cns: False
+# Sizes in Gi
+metrics_volume_size: '25'
+logging_volume_size: '25'
+registry_volume_size: '25'
+prometheus_volume_size: '25'
 
-deploy_service_catalog: True
-deploy_template_service_broker: True
+# OpenShift Container StorageClass
+# Sizes in Gi
+# infra usable storage needs to be greater than below calculations
+# logging_volume_size * ec2_count_infra) + metrics_volume_size + prometheus_volume_size) * 1.3  
+ocs_infra_cluster_usable_storage: '200'
+ocs_infra_cluster_allocated_storage: "{{ ((( logging_volume_size|int * ec2_count_infra|int ) + metrics_volume_size|int  + prometheus_volume_size|int ) * 1.3 ) | round | int }}"
+ocs_app_cluster_usable_storage: '100'
 
-###################################
-# Networking
-os_sdn_network_plugin_name: 'redhat/openshift-ovs-multitenant'
+#######################
+# UI customization
+#######################
+#project_request_message: To create a new project, contact your team administrator.

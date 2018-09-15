@@ -31,6 +31,10 @@
         - ( state is defined ) and ( 'absent' in state )
         - cpkuser.changed
 
+    - set_fact:
+        cpk_access_key: "{{ cpkuser.user_meta.access_keys[0].access_key_id }}"
+        cpk_secret_key: "{{ cpkuser.user_meta.access_keys[0].secret_access_key_id }}"
+
     - name: IAM cloudprovider_kind access key content
       blockinfile:
         path: "~/.ssh/config-{{ clusterid }}.{{ dns_domain }}-cpkuser_access_key"
@@ -38,8 +42,8 @@
         marker: "<!-- {mark} OUTPUT -->"
         state: "{{ state | default('present') }}"
         content: |
-          openshift_cloudprovider_aws_access_key={{ cpkuser.user_meta.access_keys[0].access_key_id }}
-          openshift_cloudprovider_aws_secret_key={{ cpkuser.user_meta.access_keys[0].secret_access_key }}
+          openshift_cloudprovider_aws_access_key={{ cpk_access_key }}
+          openshift_cloudprovider_aws_secret_key={{ cpk_secret_key }}
       when:
         - ( state is not defined ) or ( 'absent' not in state )
         - cpkuser.changed
@@ -77,14 +81,18 @@
         - ( state is defined ) and ( 'absent' in state )
         - s3user.changed
 
+    - set_fact:
+        s3_access_key: "{{ s3user.user_meta.access_keys[0].access_key_id }}"
+        s3_secret_key: "{{ s3user.user_meta.access_keys[0].secret_access_key_id }}"
+
     - name: IAM s3user access key into content
       blockinfile:
         path: "~/.ssh/config-{{ clusterid }}.{{ dns_domain }}-s3user_access_key"
         create: yes
         marker: "<!-- {mark} OUTPUT -->"
         content: |
-          openshift_hosted_registry_storage_s3_accesskey={{ s3user.user_meta.access_keys[0].access_key_id }}
-          openshift_hosted_registry_storage_s3_secretkey={{ s3user.user_meta.access_keys[0].secret_access_key }}
+          openshift_hosted_registry_storage_s3_accesskey={{ s3_access_key }}
+          openshift_hosted_registry_storage_s3_secretkey={{ s3_secret_key }}
       when:
         - ( state is not defined ) or ( 'absent' not in state )
         - s3user.changed
@@ -104,6 +112,12 @@
 # Run this block if no admin rights are available
 - block:
 
+    - set_fact:
+        s3_access_key: "{{ aws_access_key }}"
+        s3_secret_key: "{{ aws_secret_key }}"
+        cpk_access_key: "{{ aws_access_key }}"
+        cpk_secret_key: "{{ aws_secret_key }}"
+
     - name: "{{ 'Create' if (state is undefined or 'absent' not in state) else 'Terminate' }} IAM user access key file ( cloudprovider_kind )"
       file:
         path: "~/.ssh/config-{{ clusterid }}.{{ dns_domain }}-cpkuser_access_key"
@@ -118,8 +132,8 @@
         marker: "<!-- {mark} OUTPUT -->"
         state: "{{ state | default('present') }}"
         content: |
-          openshift_cloudprovider_aws_access_key={{ aws_access_key_id }}
-          openshift_cloudprovider_aws_secret_key={{ aws_secret_access_key }}
+          openshift_cloudprovider_aws_access_key={{ cpk_access_key }}
+          openshift_cloudprovider_aws_secret_key={{ cpk_secret_key }}
       when:
         - ( state is not defined ) or ( 'absent' not in state )
 
@@ -136,8 +150,8 @@
         create: yes
         marker: "<!-- {mark} OUTPUT -->"
         content: |
-          openshift_hosted_registry_storage_s3_accesskey={{ aws_access_key_id }}
-          openshift_hosted_registry_storage_s3_secretkey={{ aws_secret_access_key }}
+          openshift_hosted_registry_storage_s3_accesskey={{ s3_access_key }}
+          openshift_hosted_registry_storage_s3_secretkey={{ s3_secret_key }}
       when:
         - ( state is not defined ) or ( 'absent' not in state )
 
