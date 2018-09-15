@@ -1,10 +1,12 @@
 ---
 - hosts: localhost
   become: False
+  vars_files:
+    - ./vars.ynml
   vars:
     - state: 'absent'
   tasks:
-    #- import_tasks: roles/aws/tasks/rhsm_unregister.yaml
+    - import_tasks: roles/aws/tasks/rhsm_unregister.yaml
     - import_tasks: roles/aws/tasks/getcreds.yaml
     - import_tasks: roles/aws/tasks/getazs.yaml
     - import_tasks: roles/aws/tasks/getec2ami.yaml
@@ -17,7 +19,6 @@
     - import_tasks: roles/aws/tasks/s3.yaml
     - import_tasks: roles/aws/tasks/natgw.yaml
     - import_tasks: roles/aws/tasks/elb.yaml
-    #- import_tasks: roles/aws/tasks/ec2_cns.yaml
     - import_tasks: roles/aws/tasks/ec2.yaml
     - import_tasks: roles/aws/tasks/securitygrouprule_cns.yaml
     - import_tasks: roles/aws/tasks/securitygroup_cns.yaml
