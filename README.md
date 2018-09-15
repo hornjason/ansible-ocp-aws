@@ -18,7 +18,7 @@ Master Nodes | ocp-master-# | 3 | Standard_D4s_v3 | 4 | 16
 Infra Nodes | ocp-infra-# | 3 | Standard_D4s_v3 | 4 | 16   
 App Nodes | ocp-app-# | 3 | Standard_D2S_v3 | 2 | 8  
 Bastion | bastion | 1 | Standard_D1 | 1 | 3.5
-Total | | 13 | | 55 | 219.5Gb 
+Total | | 10 | | 31 | 123.5Gb 
 
 
 VM sizes can be configured from defaults by changing the following variables, if the sizes chosen are below minimum OpenShift requirements deployment checks will fail.
@@ -75,8 +75,9 @@ A few Pre-Reqs need to be met and are documented in the Reference Architecture a
  7. Fill out required variables below.
  8. Due to bug https://github.com/ansible/ansible/issues/40332 if the ansible control host used to deploy from has LANG set to something other than `en` then you must  `unset LANG`
  9. Due to bug https://github.com/openshift/openshift-ansible/pull/9971, 2 OCS registries will fail to install unless you clone https://github.com/openshift/openshift-ansible.git 
- - cd /usr/share/ansible/; mv openshift-ansible openshift-ansible-rpm; git clone https://github.com/openshift/openshift-ansible.git; cd -
-
+```
+cd /usr/share/ansible/; mv openshift-ansible openshift-ansible-rpm; git clone https://github.com/openshift/openshift-ansible.git; cd -
+```
 ## Required Variables
 Most defaults are specified in `role/aws/defaults/main.yml`,  Sensitive information is left out and should be entered in `vars.yml`.  Below are required variables that should be filled in before deploying.
 clusterid: "awscluster"
@@ -117,9 +118,9 @@ By Default the HTPasswdPasswordIdentityProvider is used but can be customized,  
 
 ## Deployment
 After all pre-reqs are met and required variables have been filled out the deployment consists of running the following:
-`ansible-playbook deploy.yml -e @vars.yml`
+`ansible-playbook deploy.yml `
 
 The ansible control host running the deployment will be setup to use ssh proxy through the bastion in order to reach all nodes.  The openshift inventory `hosts` file will be templated into the project root directory and used for the Installation.  
 
 ## Destroy
-`ansible-playbook destroy.yml -e@vars.yml`
+`ansible-playbook destroy.yml `
