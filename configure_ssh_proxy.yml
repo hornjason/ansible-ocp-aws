@@ -6,6 +6,7 @@
       Export the following Variables to switch between multiple clusters
       - export CLUSTERID={{ clusterid }}
       - export CLUSTERDOMAIN={{ dns_domain }}
+      - source ./bashrc
   vars_files:
     - "./vars.yml"
   tasks:
