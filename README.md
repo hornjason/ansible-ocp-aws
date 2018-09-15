@@ -32,10 +32,7 @@ VM sizes can be configured from defaults by changing the following variables, if
 | vm_size_bastion: | Standard_D1
 
 
->After installing and setting up AWS CLI the following command can be used to show available VM Resources in a location.
-```
-az vm list-usage --location westus --output table
-```
+
 
 ## Pre-Reqs
 
