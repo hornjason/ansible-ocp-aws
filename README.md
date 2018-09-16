@@ -64,6 +64,8 @@ A few Pre-Reqs need to be met and are documented in the Reference Architecture a
  ```
  aws_access_key: AWS_SECRET_ACCESS_KEY
  aws_secret_key: AWS_SECRET_ACCESS_KEY
+ **Optional**
+ aws_cred_profile: AWS_PROFILE
  ```
  ```
  ansible-playbook aws-cli.yml
