@@ -76,9 +76,9 @@ A few Pre-Reqs need to be met and are documented in the Reference Architecture a
   ```
  5. Fill out required variables below.
  6. Due to bug https://github.com/ansible/ansible/issues/40332 if the ansible control host used to deploy from has LANG set to something other than `en` then you must  `unset LANG`
- 7. Due to bug https://github.com/openshift/openshift-ansible/pull/9971, 2 OCS registries will fail to install unless you clone https://github.com/openshift/openshift-ansible.git 
+ 7. Due to bug https://github.com/openshift/openshift-ansible/pull/9971, Installing 2 OCS clusters will fail to install unless you clone https://github.com/openshift/openshift-ansible.git 
 ```
-sudo cd /usr/share/ansible/ && sudo mv openshift-ansible openshift-ansible-rpm && sudo git clone https://github.com/openshift/openshift-ansible.git && cd -
+cd /usr/share/ansible/ && sudo mv openshift-ansible openshift-ansible-rpm && sudo git clone https://github.com/openshift/openshift-ansible.git cd openshift-ansible && git checkout release-3.10 && cd -
 ```
 ## Required Variables
 Most defaults are specified in `role/aws/defaults/main.yml`,  Sensitive information is left out and should be entered in `vars.yml`.  Below are required variables that should be filled in before deploying.
@@ -120,7 +120,11 @@ By Default the HTPasswdPasswordIdentityProvider is used but can be customized,  
 
 ## Deployment
 After all pre-reqs are met and required variables have been filled out the deployment consists of running the following:
-`ansible-playbook deploy.yml `
+```
+ansible-playbook deploy.yml
+ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+```
 
 The ansible control host running the deployment will be setup to use ssh proxy through the bastion in order to reach all nodes.  The openshift inventory `hosts` file will be templated into the project root directory and used for the Installation.  
 
