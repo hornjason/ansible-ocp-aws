@@ -60,7 +60,11 @@ A few Pre-Reqs need to be met and are documented in the Reference Architecture a
  ```
  git clone https://github.com/hornjason/ansible-ocp-aws.git; cd ansible-ocp-aws
  ```
- 3.  Install AWS CLI,  using playbook included or manually following above directions.
+ 3.  Install AWS CLI,  using playbook included or manually following above directions. The following variables need to be defined in vars.yml prior to running this.
+ ```
+ aws_access_key: AWS_SECRET_ACCESS_KEY
+ aws_secret_key: AWS_SECRET_ACCESS_KEY
+ ```
  ```
  ansible-playbook aws-cli.yml
  ```
@@ -81,6 +85,8 @@ dns_domain: "example.com"
 aws_region: "us-east-1"
 
  - **aws_region**:  - AWS location for deployment ex. `us-east-1`
+ - **aws_access_key**:  - AWS_ACCESS_KEY_ID - Either export this variable or include in vars.yml
+ - **aws_secret_key:** - AWS_SECRET_ACCESS_KEY - Either export this variable or include in vars.yml
  - **clusterid**:  - Azure Resource Group ex. `test-rg`
  - **vpc_cidr**: - Can customize as needed, ex `"10.0.0.0/16"`
  - **admin_user**: - SSH user that will be created on each VM ex. `cloud-user`
