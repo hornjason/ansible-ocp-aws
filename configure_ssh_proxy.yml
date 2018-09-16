@@ -1,5 +1,7 @@
 ---
 - hosts: localhost
+  vars_files:
+    - "./vars.yml"
   vars:
     ssh_config_file: "{{ lookup('env', 'HOME') }}/.ssh/config-{{ clusterid }}.{{ dns_domain }}"
     message: |
@@ -7,8 +9,6 @@
       - export CLUSTERID={{ clusterid }}
       - export CLUSTERDOMAIN={{ dns_domain }}
       - source ./bashrc
-  vars_files:
-    - "./vars.yml"
   tasks:
     - name: Ensure {{ ssh_config_file }} exists
       file:

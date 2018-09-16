@@ -99,7 +99,7 @@ openshift_hosted_prometheus_deploy=False
 {% endif %}
 
 # grafana
-{% if deploy_prometheus | default(true) | bool %}
+{% if deploy_grafana | default(true) | bool %}
 openshift_grafana_state=present
 openshift_grafana_node_exporter=True
 openshift_grafana_storage_type=pvc

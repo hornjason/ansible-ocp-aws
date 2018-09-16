@@ -1,6 +1,9 @@
+---
 - name: Azure CLI | Pre-Reqs
   hosts: localhost
   become: true
+  vars_files:
+    - ./vars.yml
   vars:
     home_dir: "{{ lookup('env', 'HOME') }}"
     rhsm_repos:
@@ -12,12 +15,34 @@
     rhsm_repos_disable:
       - rhel-7-server-htb-rpms
       - rhel-7-server-ose-3.9-rpms
-    message: |
+    setup_complete_message: |
+
       This host is now setup, next steps are
         Copy vars.yml.example to vars.yml
         - cp vars.yml.example vars.yml
         Edit vars.yml
         - vi vars.yml
+        Configure AWS CLI Credentials
+        - aws configure 
+        or with a profile
+        - aws configure --profile profilename
+
+    fail_msg: |
+        AWS_ACCESS_KEY_ID and/or 
+        AWS_SECRET_ACCESS_KEY not found, 
+        make sure the following variables are correct in vars.yml
+          - aws_access_key 
+          - aws_secret_key
+
+ 
+  pre_tasks:
+    - name: Pre-Setup | AWS_ACCESS_KEY Check"
+      debug: 
+        msg: "{{ fail_msg.split('\n') }}"
+      when: (aws_access_key is not defined or aws_access_key == '') or 
+            (aws_secret_key is not defined or aws_secret_key == '')
+      failed_when: (aws_access_key is not defined or aws_access_key == '') or 
+            (aws_secret_key is not defined or aws_secret_key == '')
 
   tasks:
     - name: Setup | Disable RHSM repositories 
@@ -55,26 +80,36 @@
         - boto
         - awscli
 
-    - name: 'Create the AWS config directory'
-      file:
-        path: "{{ home_dir }}/.aws"
-        state: directory
-        mode: 0755
+    #- name: Setup | Create the AWS config directory
+    #  file:
+    #    path: "{{ home_dir }}/.aws"
+    #    state: directory
+    #    mode: 0755
  
-    - name: 'Copy AWS CLI config'
-      template:
-        src: aws_cli_config.j2
-        dest: "{{ home_dir }}/.aws/config"
-        mode: 0600
+    #- name: Setup | Check for AWS CLI config files
+    #  stat:
+    #    path: "{{ home_dir }}/.aws/config"
+    #  register: aws_config_file
+
+    #- name: Setup | Check for AWS CLI credentials files
+    #  stat:
+    #    path: "{{ home_dir }}/.aws/credentials"
+    #  register: aws_config_file
+
+    #- name: Setup | Copy AWS CLI config
+    #  template:
+    #    src: aws_cli_config.j2
+    #    dest: "{{ home_dir }}/.aws/config"
+    #    mode: 0600
  
-    - name: 'Copy AWS CLI credentials'
-      tags: 'aws-cli'
-      template:
-        src: aws_cli_credentials.j2
-        dest: "{{ home_dir }}/.aws/credentials"
-        mode: 0600
+    #- name: 'Copy AWS CLI credentials'
+    #  tags: 'aws-cli'
+    #  template:
+    #    src: aws_cli_credentials.j2
+    #    dest: "{{ home_dir }}/.aws/credentials"
+    #    mode: 0600
  
-     - name: Setup | Prompt
-       debug:
-         msg: "{{ message.split('\n') }}"
+    - name: Setup | Prompt
+      debug:
+        msg: "{{ setup_complete_message.split('\n') }}"
  
