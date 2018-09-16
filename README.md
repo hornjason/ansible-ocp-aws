@@ -72,7 +72,7 @@ A few Pre-Reqs need to be met and are documented in the Reference Architecture a
  6. Due to bug https://github.com/ansible/ansible/issues/40332 if the ansible control host used to deploy from has LANG set to something other than `en` then you must  `unset LANG`
  7. Due to bug https://github.com/openshift/openshift-ansible/pull/9971, 2 OCS registries will fail to install unless you clone https://github.com/openshift/openshift-ansible.git 
 ```
-cd /usr/share/ansible/; mv openshift-ansible openshift-ansible-rpm; git clone https://github.com/openshift/openshift-ansible.git; cd -
+sudo cd /usr/share/ansible/ && sudo mv openshift-ansible openshift-ansible-rpm && sudo git clone https://github.com/openshift/openshift-ansible.git && cd -
 ```
 ## Required Variables
 Most defaults are specified in `role/aws/defaults/main.yml`,  Sensitive information is left out and should be entered in `vars.yml`.  Below are required variables that should be filled in before deploying.
