@@ -103,7 +103,7 @@ Number of Nodes
  - **app_nodes**:    Defaults to 3 
 
 Optional Variables:
- 
+- **aws_cred_profile:** -This will create an additonal profile for AWS Authentication (~/.aws/credentials , ~/.aws/config)
 By Default the HTPasswdPasswordIdentityProvider is used but can be customized,  this will be templated out to the ansible hosts file.  By default htpasswd user is added.
 - **openshift_master_htpasswd_users**: - Contains the user: < passwd hash generated from htpasswd -n user >
 - **deploy_cns**: true
