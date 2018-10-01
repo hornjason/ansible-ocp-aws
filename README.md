@@ -55,7 +55,7 @@ A few Pre-Reqs need to be met and are documented in the Reference Architecture a
     --enable="rhel-7-fast-datapath-rpms" \
     --enable="rhel-7-server-ansible-2.5-rpms"
 
-    sudo yum -y install ansible atomic-openshift-utils git
+    sudo yum -y install ansible atomic-openshift-utils git tmux screen vim
 ```
 
  2. Clone this repository
