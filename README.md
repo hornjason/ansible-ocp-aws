@@ -51,7 +51,7 @@ A few Pre-Reqs need to be met and are documented in the Reference Architecture a
     sudo subscription-manager repos \
     --enable="rhel-7-server-rpms" \
     --enable="rhel-7-server-extras-rpms" \
-    --enable="rhel-7-server-ose-3.9-rpms" \
+    --enable="rhel-7-server-ose-3.10-rpms" \
     --enable="rhel-7-fast-datapath-rpms" \
     --enable="rhel-7-server-ansible-2.5-rpms"
 
