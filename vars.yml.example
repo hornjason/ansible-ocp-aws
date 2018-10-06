@@ -161,8 +161,13 @@ prometheus_volume_size: '25'
 # infra usable storage needs to be greater than below calculations
 # logging_volume_size * ec2_count_infra) + metrics_volume_size + prometheus_volume_size) * 1.3  
 ocs_infra_cluster_usable_storage: '200'
-ocs_infra_cluster_allocated_storage: "{{ ((( logging_volume_size|int * ec2_count_infra|int ) + metrics_volume_size|int  + prometheus_volume_size|int ) * 1.3 ) | round | int }}"
 ocs_app_cluster_usable_storage: '100'
+ocs_infra_cluster_allocated_storage: "{{ ((( logging_volume_size|int * ec2_count_infra|int ) + metrics_volume_size|int  + prometheus_volume_size|int ) * 1.3 ) | round | int }}"
+
+########################
+## Disable checks (Only Recommended for testing)
+########################
+#openshift_disable_check:  'memory_availability,disk_availability'
 
 #######################
 # UI customization

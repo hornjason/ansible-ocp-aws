@@ -34,6 +34,3 @@
       when: ( aws_route53 | bool ) and ( aws_route53 is defined )
     - import_tasks: roles/aws/tasks/configfiles.yaml
     - import_tasks: roles/aws/tasks/configfilesdata.yaml
-     
-- name: Configuring SSH for this environment
-  import_playbook: configure_ssh_proxy.yml 

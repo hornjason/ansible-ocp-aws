@@ -49,6 +49,45 @@
   changed_when: "( r53_record.msg is defined ) and ( 'filler msg to prevent changed task' in r53_record.msg )"
   failed_when: "( r53_record.msg is defined ) and ( 'filler msg to prevent failed task' in r53_record.msg )"
 
+- name: Gather Route53 record facts for masters private addresses
+  ignore_errors: True
+  route53:
+    command: get
+    private_zone: yes
+    record: "master{{ item }}.{{ clusterid }}.{{ dns_domain }}"
+    type: CNAME
+    zone: "{{ dns_domain }}"
+  register: r53_masters_record
+  loop: "{{ lookup('sequence', 'start=1 end={{ ec2_count_master|default(3) }}', wantlist=True )  }}"
+  changed_when: "( r53_masters_record.msg is defined ) and ( 'filler msg to prevent changed task' in r53_masters_record.msg )"
+  failed_when: "( r53_masters_record.msg is defined ) and ( 'filler msg to prevent failed task' in r53_masters_record.msg )"
+
+- name: Gather Route53 record facts for infras private addresses
+  ignore_errors: True
+  route53:
+    command: get
+    private_zone: yes
+    record: "infra{{ item }}.{{ clusterid }}.{{ dns_domain }}"
+    type: CNAME
+    zone: "{{ dns_domain }}"
+  register: r53_infras_record
+  loop: "{{ lookup('sequence', 'start=1 end={{ ec2_count_infra|default(3) }}', wantlist=True )  }}"
+  changed_when: "( r53_infras_record.msg is defined ) and ( 'filler msg to prevent changed task' in r53_infras_record.msg )"
+  failed_when: "( r53_infras_record.msg is defined ) and ( 'filler msg to prevent failed task' in r53_infras_record.msg )"
+
+- name: Gather Route53 record facts for nodes private addresses
+  ignore_errors: True
+  route53:
+    command: get
+    private_zone: yes
+    record: "node{{ item }}.{{ clusterid }}.{{ dns_domain }}"
+    type: CNAME
+    zone: "{{ dns_domain }}"
+  register: r53_nodes_record
+  loop: "{{ lookup('sequence', 'start=1 end={{ ec2_count_node|default(3) }}', wantlist=True )  }}"
+  changed_when: "( r53_nodes_record.msg is defined ) and ( 'filler msg to prevent changed task' in r53_nodes_record.msg )"
+  failed_when: "( r53_nodes_record.msg is defined ) and ( 'filler msg to prevent failed task' in r53_nodes_record.msg )"
+
 - name: Gather VPC facts
   ec2_vpc_net_facts:
     filters:

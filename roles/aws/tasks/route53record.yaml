@@ -70,3 +70,55 @@
   ( ( r53_record.results[3].set is defined ) and ( r53_record.results[3].set | length > 0 ) ) \
   or \
   ( ( r53_record.results[3].msg is defined ) and ( 'Zone ' + clusterid + '.' + dns_domain + '.' + ' does not exist in Route53' not in r53_record.results[3].msg ) )"
+
+
+- name: "{{ 'create' if (state is undefined or 'absent' not in state) else 'terminate' }} Masters internal route53 record"
+  route53:
+    command: "{{ 'create' if (state is undefined or 'absent' not in state) else 'delete' }}"
+    overwrite: "yes"
+    private_zone: "yes"
+    record: "master{{ idx +1 }}.{{ clusterid }}.{{ dns_domain }}"
+    type: CNAME
+    ttl: 300
+    value: "{{ item.tagged_instances[0].private_dns_name if (state is undefined or 'absent' not in state) else item.set.value }}"
+    zone: "{{ dns_domain }}."
+  loop: "{{ ec2master.results if (state is undefined or 'absent' not in state) else r53_masters_record.results }}" 
+  loop_control:
+    index_var: idx
+    label: "master{{ idx }}.{{ clusterid }}.{{ dns_domain }}"
+  when: 
+    - ( ec2master.results if (state is undefined or 'absent' not in state) else r53_masters_record.results.set is defined )
+
+- name: "{{ 'create' if (state is undefined or 'absent' not in state) else 'terminate' }} Infras internal route53 record"
+  route53:
+    command: "{{ 'create' if (state is undefined or 'absent' not in state) else 'delete' }}"
+    overwrite: "yes"
+    private_zone: "yes"
+    record: "infra{{ idx +1 }}.{{ clusterid }}.{{ dns_domain }}"
+    type: CNAME
+    ttl: 300
+    value: "{{ item.tagged_instances[0].private_dns_name if (state is undefined or 'absent' not in state) else item.set.value }}"
+    zone: "{{ dns_domain }}."
+  loop: "{{ ec2infra.results if (state is undefined or 'absent' not in state) else r53_infras_record.results }}" 
+  loop_control:
+    index_var: idx
+    label: "infra{{ idx }}.{{ clusterid }}.{{ dns_domain }}"
+  when: 
+    - ( ec2infra.results if (state is undefined or 'absent' not in state) else r53_infras_record.results.set is defined )
+
+- name: "{{ 'create' if (state is undefined or 'absent' not in state) else 'terminate' }} Nodes internal route53 record"
+  route53:
+    command: "{{ 'create' if (state is undefined or 'absent' not in state) else 'delete' }}"
+    overwrite: "yes"
+    private_zone: "yes"
+    record: "node{{ idx +1 }}.{{ clusterid }}.{{ dns_domain }}"
+    type: CNAME
+    ttl: 300
+    value: "{{ item.tagged_instances[0].private_dns_name if (state is undefined or 'absent' not in state) else item.set.value }}"
+    zone: "{{ dns_domain }}."
+  loop: "{{ ec2node.results if (state is undefined or 'absent' not in state) else r53_nodes_record.results }}" 
+  loop_control:
+    index_var: idx
+    label: "node{{ idx }}.{{ clusterid }}.{{ dns_domain }}"
+  when: 
+    - ( ec2node.results if (state is undefined or 'absent' not in state) else r53_nodes_record.results.set is defined )

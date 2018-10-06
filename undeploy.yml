@@ -2,11 +2,11 @@
 - hosts: localhost
   become: False
   vars_files:
-    - ./vars.ynml
+    - ./vars.yml
   vars:
     - state: 'absent'
   tasks:
-    - import_tasks: roles/aws/tasks/rhsm_unregister.yaml
+    #- import_tasks: roles/aws/tasks/rhsm_unregister.yaml
     - import_tasks: roles/aws/tasks/getcreds.yaml
     - import_tasks: roles/aws/tasks/getazs.yaml
     - import_tasks: roles/aws/tasks/getec2ami.yaml
@@ -14,7 +14,9 @@
     - import_tasks: roles/aws/tasks/sshkeys.yaml
     - import_tasks: roles/aws/tasks/ec2keypair.yaml
     - import_tasks: roles/aws/tasks/route53record.yaml
+      when: ( aws_route53 | bool ) and ( aws_route53 is defined )
     - import_tasks: roles/aws/tasks/route53.yaml
+      when: ( aws_route53 | bool ) and ( aws_route53 is defined )
     - import_tasks: roles/aws/tasks/iam.yaml
     - import_tasks: roles/aws/tasks/s3.yaml
     - import_tasks: roles/aws/tasks/natgw.yaml

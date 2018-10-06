@@ -41,6 +41,10 @@ openshift_examples_modify_imagestreams=true
 
 oreg_url=registry.access.redhat.com/openshift3/ose-${component}:${version}
 
+{% if openshift_disable_check is defined %}
+openshift_disable_check={{ openshift_disable_check }}
+{% endif %}
+
 {% if osm_project_request_message is defined %}
 osm_project_request_message="{{ osm_project_request_message }}"
 {% endif %}
@@ -202,8 +206,8 @@ openshift_enable_service_catalog={{ deploy_service_catalog | default('True') }}
 template_service_broker_install={{ deploy_template_service_broker | default('True') }}
 
 [masters]
-{% for i in ec2master.results %}
-{{ i.tagged_instances[0].private_dns_name }} openshift_node_labels="{'region': 'master'}"
+{% for i in range(0, ( ec2_count_master if ec2_count_master is defined else 3 ) ) %}
+master{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }}  openshift_node_group_name='node-config-master'
 {% endfor %}
 
 [etcd]
@@ -212,11 +216,11 @@ template_service_broker_install={{ deploy_template_service_broker | default('Tru
 masters
 
 [nodes]
-{% for i in ec2node.results -%}
-{{ i.tagged_instances[0].private_dns_name }} openshift_node_labels="{'region': 'apps'}"
-{% endfor -%}
-{% for i in ec2infra.results -%}
-{{ i.tagged_instances[0].private_dns_name }} openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+{% for i in range(0, ( ec2_count_node if ec2_count_node is defined else 3 ) ) %}
+node{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }}  openshift_node_group_name='node-config-compute'
+{% endfor %}
+{% for i in range(0, ( ec2_count_infra if ec2_count_infra is defined else 3 ) ) %}
+infra{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }} openshift_node_group_name='node-config-infra'
 {% endfor %}
 [nodes:children]
 masters
@@ -224,19 +228,19 @@ masters
 {% if deploy_cns |default('true') | bool and deploy_cns is defined %}
 {% if ec2_count_infra + ec2_count_node >= 6 %}
 [glusterfs]
-{% for i in ec2node.results %}
-{{ i.tagged_instances[0].private_dns_name }} glusterfs_zone={{ loop.index }} glusterfs_devices='[ "/dev/nvme3n1" ]'
+{% for i in range(0, ( ec2_count_node if ec2_count_node is defined else 3 ) ) %}
+node{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }} glusterfs_zone={{ loop.index }} glusterfs_devices='[ "/dev/nvme3n1" ]'
 {% endfor %}
 
 [glusterfs_registry]
-{% for i in ec2infra.results %}
-{{ i.tagged_instances[0].private_dns_name }} glusterfs_zone={{ loop.index }} glusterfs_devices='["/dev/nvme3n1"]'
+{% for i in range(0, ( ec2_count_infra if ec2_count_infra is defined else 3 ) ) %}
+infra{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }} glusterfs_zone={{ loop.index }} glusterfs_devices='["/dev/nvme3n1"]'
 {% endfor %}
 {% else %}
 
 [glusterfs]
-{% for i in ec2infra.results %}
-{{ i.tagged_instances[0].private_dns_name }} glusterfs_zone={{ loop.index }} glusterfs_devices='[ "/dev/nvme3n1" ]'
+{% for i in range(0, ( ec2_count_infra if ec2_count_infra is defined else 3 ) ) %}
+infra{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }} glusterfs_zone={{ loop.index }} glusterfs_devices='["/dev/nvme3n1"]'
 {% endfor %}
 {% endif %}
 {% endif %}

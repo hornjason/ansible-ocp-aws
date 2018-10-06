@@ -13,7 +13,8 @@ Host aws-{{ clusterid }}-bastion
   ServerAliveInterval      30
   IdentityFile             ~/.ssh/{{ clusterid }}.{{ dns_domain }}
 
-Host *.compute.internal
+
+Host *.{{ clusterid }}.{{ dns_domain }}
   ProxyCommand             ssh -W %h:%p aws-{{ clusterid }}-bastion
   user                     ec2-user
   StrictHostKeyChecking    no
@@ -21,10 +22,18 @@ Host *.compute.internal
   ServerAliveInterval      30
   IdentityFile             ~/.ssh/{{ clusterid }}.{{ dns_domain }}
 
-Host *.ec2.internal
-  ProxyCommand             ssh -W %h:%p aws-{{ clusterid }}-bastion
-  user                     ec2-user
-  StrictHostKeyChecking    no
-  CheckHostIP              no
-  ServerAliveInterval      30
-  IdentityFile             ~/.ssh/{{ clusterid }}.{{ dns_domain }}
+#Host *.compute.internal
+#  ProxyCommand             ssh -W %h:%p aws-{{ clusterid }}-bastion
+#  user                     ec2-user
+#  StrictHostKeyChecking    no
+#  CheckHostIP              no
+#  ServerAliveInterval      30
+#  IdentityFile             ~/.ssh/{{ clusterid }}.{{ dns_domain }}
+#
+#Host *.ec2.internal
+#  ProxyCommand             ssh -W %h:%p aws-{{ clusterid }}-bastion
+#  user                     ec2-user
+#  StrictHostKeyChecking    no
+#  CheckHostIP              no
+#  ServerAliveInterval      30
+#  IdentityFile             ~/.ssh/{{ clusterid }}.{{ dns_domain }}
