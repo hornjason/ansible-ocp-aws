@@ -62,7 +62,7 @@ A few Pre-Reqs need to be met and are documented in the Reference Architecture a
  ```
  3.  Install AWS CLI,  using playbook included or manually following above directions. The following variables need to be defined in vars.yml prior to running this.
  ```
- aws_access_key: AWS_SECRET_ACCESS_KEY
+ aws_access_key:  AWS_ACCESS_KEY_ID
  aws_secret_key: AWS_SECRET_ACCESS_KEY
  **Optional**
  aws_cred_profile: AWS_PROFILE
