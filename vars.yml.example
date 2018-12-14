@@ -156,6 +156,10 @@ logging_volume_size: '25'
 registry_volume_size: '25'
 prometheus_volume_size: '25'
 
+# Limit ElasticSearch memory consumption per pod
+# Defaults to 16Gi
+#openshift_logging_es_memory_limit: "8Gi"
+
 # OpenShift Container StorageClass
 # Sizes in Gi
 # infra usable storage needs to be greater than below calculations
