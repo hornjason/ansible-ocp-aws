@@ -18,9 +18,9 @@ rh_subscription:
 {% if rhsm_key is defined and rhsm_key is not "" %}
     activation-key: {{ rhsm_key }}
     org: {{ rhsm_org }}
-{% elif rshm_username defined and rhsm_username is not "" %}
-    username: {{ rhsm_username }}
-    password: {{ rhsm_password }}
+{% elif rshm_user defined and rhsm_user is not "" %}
+    username: {{ rhsm_user }}
+    password: {{ rhsm_pass }}
 {% endif %}
     add-pool:
 {% if 'node' in item.name %}
