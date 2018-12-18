@@ -15,10 +15,10 @@ cloud_final_modules:
 - package-update-upgrade-install
 
 rh_subscription:
-{% if rhsm_key is defined and rhsm_key is not "" %}
+{% if rhsm_key is defined and rhsm_key != '' %}
     activation-key: {{ rhsm_key }}
     org: {{ rhsm_org }}
-{% elif rshm_user defined and rhsm_user is not "" %}
+{% elif rshm_user defined and rhsm_user != "" %}
     username: {{ rhsm_user }}
     password: {{ rhsm_pass }}
 {% endif %}
