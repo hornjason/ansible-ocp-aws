@@ -49,10 +49,9 @@ A few Pre-Reqs need to be met and are documented in the Reference Architecture a
     --enable="rhel-7-server-rpms" \
     --enable="rhel-7-server-extras-rpms" \
     --enable="rhel-7-server-ose-3.10-rpms" \
-    --enable="rhel-7-fast-datapath-rpms" \
-    --enable="rhel-7-server-ansible-2.5-rpms"
+    --enable="rhel-7-server-ansible-2.6-rpms"
 
-    sudo yum -y install ansiblemopenshift-ansible git
+    sudo yum -y install ansible openshift-ansible git
 ```
 
  2. Clone this repository
@@ -93,7 +92,7 @@ aws_region: "us-east-1"
  - **vpc_cidr**: - Can customize as needed, ex `"10.0.0.0/16"`
  - **admin_user**: - SSH user that will be created on each VM ex. `cloud-user`
  - **rhsm_user**: - If subscribing to RHSM using username / password, fill in username
- - **rhsm_pass**: - If subscribing to RHSM using username / password, fill in passowrd for RHSM 
+ - **rhsm_password**: - If subscribing to RHSM using username / password, fill in passowrd for RHSM 
  - **rhsm_key**: -  If subscribing to RHSM using activation key and orgId fill in activation key here.
  - **rhsm_org**: - If subscribing to RHSM using activation key and orgId fill in orgId here.
  - **rhsm_broker_pool**: - If you have a broker pool id for masters / infra nodes fill it in here.  This will be used to for all masters/infra nodes.  If you only have one pool id to use make this the same as `rhsm_node_pool`.
