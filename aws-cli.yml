@@ -1,22 +1,22 @@
 ---
 - name: Azure CLI | Pre-Reqs
   hosts: localhost
-  become: true
+  become: True
   vars_files:
     - ./vars.yml
   vars:
     home_dir: "{{ lookup('env', 'HOME') }}"
-    rhsm_repos:
-      - rhel-7-server-rpms
-      - rhel-7-server-extras-rpms
-      - rhel-7-server-ose-3.10-rpms
-      - rhel-7-fast-datapath-rpms
-      - rhel-7-server-ansible-2.5-rpms
+    required_repos:
+        - rhel-7-server-rpms
+        - rhel-7-server-extras-rpms
+        - rhel-7-server-ose-3.11-rpms
+        - rhel-7-server-ansible-2.6-rpms
+        - rhel-7-server-rh-common-rpms
+    rhsm_pool: '8a85f98c60c2c2b40160c32445b41b29'
     rhsm_repos_disable:
       - rhel-7-server-htb-rpms
       - rhel-7-server-ose-3.9-rpms
     setup_complete_message: |
-
       This host is now setup, next steps are
         Copy vars.yml.example to vars.yml
         - cp vars.yml.example vars.yml
@@ -26,35 +26,24 @@
         - aws configure 
         or with a profile
         - aws configure --profile profilename
-
     fail_msg: |
         AWS_ACCESS_KEY_ID and/or 
         AWS_SECRET_ACCESS_KEY not found, 
         make sure the following variables are correct in vars.yml
           - aws_access_key 
           - aws_secret_key
-
- 
   pre_tasks:
     - name: Pre-Setup | AWS_ACCESS_KEY Check"
       debug: 
         msg: "{{ fail_msg.split('\n') }}"
-      when: (aws_access_key is not defined or aws_access_key == '') or 
+      when: ( aws_access_key is not defined or aws_access_key == '') or 
             (aws_secret_key is not defined or aws_secret_key == '')
       failed_when: (aws_access_key is not defined or aws_access_key == '') or 
             (aws_secret_key is not defined or aws_secret_key == '')
 
+  roles:
+    - rhsm
   tasks:
-    - name: Setup | Disable RHSM repositories 
-      rhsm_repository: 
-        name: "{{ rhsm_repos_disable }}" 
-        state: disabled
-
-    - name: Setup | Enable RHSM repositories 
-      rhsm_repository: 
-        name: "{{ rhsm_repos }}" 
-        state: enabled 
-
     - name: Setup | Install required packages 
       yum: 
         name: "{{ item }}" 
@@ -72,7 +61,7 @@
         name: epel-release
         state: absent
 
-    - name: Setup | Install Azure ansible pip modules
+    - name: Setup | Install AWS ansible pip modules
       pip:
         name: "{{ item }}"
       loop:

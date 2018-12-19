@@ -2,9 +2,13 @@
 masters
 etcd
 nodes
-{% if deploy_cns | default('true') | bool %}
+{% if deploy_ocs |default('true') | bool and deploy_ocs is defined %}
+{% if ec2_count_infra + ec2_count_node >= 6 %}
 glusterfs
 glusterfs_registry
+{% else %}
+glusterfs
+{% endif %}
 {% endif %}
 
 [OSEv3:vars]
@@ -49,7 +53,7 @@ openshift_disable_check={{ openshift_disable_check }}
 osm_project_request_message="{{ osm_project_request_message }}"
 {% endif %}
 
-{% if deploy_cns | default(true) | bool %}
+{% if deploy_ocs | default(true) | bool %}
 # CNS Cnfiguration
 # Container image to use for glusterfs pods
 openshift_storage_glusterfs_image="registry.access.redhat.com/rhgs3/rhgs-server-rhel7:v3.10"
@@ -75,7 +79,7 @@ openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra": "true"}
 openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra": "true"}
 openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra": "true"}
 {% else %}
-openshift_logging_install_logging=True
+openshift_logging_install_logging=False
 {% endif %}
 
 # metrics
@@ -147,8 +151,56 @@ openshift_storage_glusterfs_registry_block_storageclass_default=false
 {% endif %}
 
 {% else %}
-# StorageClass if not CNS
+# If not using OCS
+# StorageClass if not OCS
 openshift_storageclass_default=true
+
+# logging
+{% if deploy_logging | default('True') | bool %}
+openshift_logging_install_logging=True
+openshift_logging_es_pvc_size={{ logging_volume_size }}
+openshift_logging_es_cluster_size=1
+openshift_logging_kibana_nodeselector={"node-role.kubernetes.io/infra": "true"}
+openshift_logging_curator_nodeselector={"node-role.kubernetes.io/infra": "true"}
+openshift_logging_es_nodeselector={"node-role.kubernetes.io/infra": "true"}
+{% else %}
+openshift_logging_install_logging=False
+{% endif %}
+
+# metrics
+{% if deploy_logging | default('True') | bool %}
+openshift_metrics_install_metrics=True
+openshift_metrics_storage_volume_size={{ metrics_volume_size }}
+openshift_metrics_hawkular_nodeselector={"node-role.kubernetes.io/infra": "true"}
+openshift_metrics_cassandra_nodeselector={"node-role.kubernetes.io/infra": "true"}
+openshift_metrics_heapster_nodeselector={"node-role.kubernetes.io/infra": "true"}
+{% else %}
+openshift_metrics_install_metrics=False
+{% endif %}
+
+# prometheus
+{% if deploy_prometheus | default(True) | bool %}
+openshift_hosted_prometheus_deploy=True
+openshift_prometheus_storage_volume_size={{ prometheus_volume_size | default('25Gi') }}
+{% else %}
+openshift_hosted_prometheus_deploy=False
+{% endif %}
+
+# grafana
+{% if deploy_grafana | default(true) | bool %}
+openshift_grafana_state=present
+openshift_grafana_node_exporter=True
+openshift_grafana_prometheus_namespace='openshift-metrics'
+openshift_grafana_prometheus_serviceaccount='prometheus'
+openshift_grafana_prometheus_route='prometheus'
+{% else %}
+openshift_grafana_state=absent
+{% endif %}
+
+
+
+
+# End deploy_ocs FALSE
 {% endif %}
 
 openshift_hosted_router_selector='region=infra'
@@ -225,7 +277,7 @@ infra{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }} openshift_node_group_name='nod
 [nodes:children]
 masters
 
-{% if deploy_cns |default('true') | bool and deploy_cns is defined %}
+{% if deploy_ocs |default('true') | bool and deploy_ocs is defined %}
 {% if ec2_count_infra + ec2_count_node >= 6 %}
 [glusterfs]
 {% for i in range(0, ( ec2_count_node if ec2_count_node is defined else 3 ) ) %}

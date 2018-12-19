@@ -15,12 +15,12 @@ cloud_final_modules:
 - package-update-upgrade-install
 
 rh_subscription:
-{% if rhsm_key is defined and rhsm_key != '' %}
+{% if rhsm_key is defined %}
     activation-key: {{ rhsm_key }}
     org: {{ rhsm_org }}
-{% elif rshm_user defined and rhsm_user != "" %}
+{% elif rhsm_user is defined  %}
     username: {{ rhsm_user }}
-    password: {{ rhsm_pass }}
+    password: {{ rhsm_password }}
 {% endif %}
     add-pool:
 {% if 'node' in item.name %}

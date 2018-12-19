@@ -22,9 +22,11 @@
     - import_tasks: roles/aws/tasks/natgw.yaml
     - import_tasks: roles/aws/tasks/elb.yaml
     - import_tasks: roles/aws/tasks/ec2.yaml
-    - import_tasks: roles/aws/tasks/securitygrouprule_cns.yaml
+    # - import_tasks: roles/aws/tasks/securitygrouprule_cns.yaml
+    #when: ( deploy_ocs | bool ) and ( deploy_ocs is defined )
     - import_tasks: roles/aws/tasks/securitygroup_cns.yaml
-    - import_tasks: roles/aws/tasks/securitygrouprule.yaml
+    #  when: ( deploy_ocs | bool ) and ( deploy_ocs is defined )
+    #- import_tasks: roles/aws/tasks/securitygrouprule.yaml
     - import_tasks: roles/aws/tasks/securitygroup.yaml
     - import_tasks: roles/aws/tasks/routetable.yaml
     - import_tasks: roles/aws/tasks/subnet.yaml
@@ -32,3 +34,4 @@
     - import_tasks: roles/aws/tasks/vpc.yaml
     - import_tasks: roles/aws/tasks/configfiles.yaml
     - import_tasks: roles/aws/tasks/configfiles_cns.yaml
+    #  when: ( deploy_ocs | bool ) and ( deploy_ocs is defined )

@@ -24,8 +24,10 @@
     - import_tasks: roles/aws/tasks/routetablerule.yaml
     - import_tasks: roles/aws/tasks/securitygroup.yaml
     - import_tasks: roles/aws/tasks/securitygroup_cns.yaml
+      when: ( deploy_ocs | bool ) and ( deploy_ocs is defined )
     - import_tasks: roles/aws/tasks/securitygrouprule.yaml
     - import_tasks: roles/aws/tasks/securitygrouprule_cns.yaml
+      when: ( deploy_ocs | bool ) and ( deploy_ocs is defined )
     - import_tasks: roles/aws/tasks/elb.yaml
     - import_tasks: roles/aws/tasks/ec2.yaml
     - import_tasks: roles/aws/tasks/eip.yaml
