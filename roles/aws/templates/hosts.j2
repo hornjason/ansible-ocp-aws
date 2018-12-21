@@ -252,18 +252,18 @@ masters
 {% if ec2_count_infra + ec2_count_node >= 6 %}
 [glusterfs]
 {% for i in range(0, ( ec2_count_node if ec2_count_node is defined else 3 ) ) %}
-node{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }} glusterfs_zone={{ loop.index }} glusterfs_devices='[ "/dev/nvme3n1" ]'
+node{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }} glusterfs_zone={{ loop.index }} glusterfs_devices='[ "/dev/xvdd" ]'
 {% endfor %}
 
 [glusterfs_registry]
 {% for i in range(0, ( ec2_count_infra if ec2_count_infra is defined else 3 ) ) %}
-infra{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }} glusterfs_zone={{ loop.index }} glusterfs_devices='["/dev/nvme3n1"]'
+infra{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }} glusterfs_zone={{ loop.index }} glusterfs_devices='["/dev/xvdd"]'
 {% endfor %}
 {% else %}
 
 [glusterfs]
 {% for i in range(0, ( ec2_count_infra if ec2_count_infra is defined else 3 ) ) %}
-infra{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }} glusterfs_zone={{ loop.index }} glusterfs_devices='["/dev/nvme3n1"]'
+infra{{ i + 1 }}.{{ clusterid }}.{{ dns_domain }} glusterfs_zone={{ loop.index }} glusterfs_devices='["/dev/xvdd"]'
 {% endfor %}
 {% endif %}
 {% endif %}
