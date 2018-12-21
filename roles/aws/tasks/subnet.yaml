@@ -14,8 +14,9 @@
     - cidr: "{{ subnets_public_cidr.2 }}"
       az: "{{ vpc_subnet_azs.2 }}"
   retries: 99
-  delay: 99
+  delay: 10
   register: subnet_public
+  until: subnet_public is success
   when: ( vpc.vpc is defined ) or ( vpc.vpcs[0] is defined )
 
 - name: "{{ 'Create' if (state is undefined or 'absent' not in state) else 'Terminate' }} Subnet ( private )"
@@ -33,6 +34,7 @@
     - cidr: "{{ subnets_private_cidr.2 }}"
       az: "{{ vpc_subnet_azs.2 }}"
   retries: 99
-  delay: 99
+  delay: 10
   register: subnet_private
+  until: subnet_private is success
   when: ( vpc.vpc is defined ) or ( vpc.vpcs[0] is defined )

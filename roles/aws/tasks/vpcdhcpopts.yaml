@@ -1,6 +1,6 @@
 ---
 - name: "Create VPC DHCP Options"
-  ec2_vpc_dhcp_options:
+  ec2_vpc_dhcp_option:
     domain_name: "{{ 'ec2.internal' if (aws_region == 'us-east-1') else aws_region + '.compute.internal' }}"
     region: "{{ aws_region }}"
     dns_servers:

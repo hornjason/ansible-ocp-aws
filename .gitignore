@@ -3,3 +3,4 @@
 *.retry
 vars.yml
 **.log
+**.pyc

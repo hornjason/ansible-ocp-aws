@@ -12,6 +12,7 @@ Host aws-{{ clusterid }}-bastion
   ControlPersist           15m
   ServerAliveInterval      30
   IdentityFile             ~/.ssh/{{ clusterid }}.{{ dns_domain }}
+  IdentitiesOnly           yes
 
 
 Host *.{{ clusterid }}.{{ dns_domain }}
@@ -21,6 +22,7 @@ Host *.{{ clusterid }}.{{ dns_domain }}
   CheckHostIP              no
   ServerAliveInterval      30
   IdentityFile             ~/.ssh/{{ clusterid }}.{{ dns_domain }}
+  IdentitiesOnly           yes
 
 #Host *.compute.internal
 #  ProxyCommand             ssh -W %h:%p aws-{{ clusterid }}-bastion

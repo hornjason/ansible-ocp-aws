@@ -1,17 +1,17 @@
 ---
 - hosts: localhost
-  become: False
+  #become: False
   vars_files:
     - ./vars.yml
   vars:
     - state: 'absent'
   tasks:
-    #- import_tasks: roles/aws/tasks/rhsm_unregister.yaml
     - import_tasks: roles/aws/tasks/getcreds.yaml
     - import_tasks: roles/aws/tasks/getazs.yaml
     - import_tasks: roles/aws/tasks/getec2ami.yaml
     - import_tasks: roles/aws/tasks/gather_facts.yaml
-    - import_tasks: roles/aws/tasks/sshkeys.yaml
+    # Moved below ec2
+    #- import_tasks: roles/aws/tasks/sshkeys.yaml
     - import_tasks: roles/aws/tasks/ec2keypair.yaml
     - import_tasks: roles/aws/tasks/route53record.yaml
       when: ( aws_route53 | bool ) and ( aws_route53 is defined )
@@ -21,12 +21,12 @@
     - import_tasks: roles/aws/tasks/s3.yaml
     - import_tasks: roles/aws/tasks/natgw.yaml
     - import_tasks: roles/aws/tasks/elb.yaml
+    #- import_tasks: roles/aws/tasks/rhsm_unregister.yaml
+    #  become: yes
     - import_tasks: roles/aws/tasks/ec2.yaml
-    # - import_tasks: roles/aws/tasks/securitygrouprule_cns.yaml
-    #when: ( deploy_ocs | bool ) and ( deploy_ocs is defined )
+    - import_tasks: roles/aws/tasks/sshkeys.yaml
     - import_tasks: roles/aws/tasks/securitygroup_cns.yaml
-    #  when: ( deploy_ocs | bool ) and ( deploy_ocs is defined )
-    #- import_tasks: roles/aws/tasks/securitygrouprule.yaml
+      when: ( deploy_ocs | bool ) and ( deploy_ocs is defined )
     - import_tasks: roles/aws/tasks/securitygroup.yaml
     - import_tasks: roles/aws/tasks/routetable.yaml
     - import_tasks: roles/aws/tasks/subnet.yaml
@@ -34,4 +34,5 @@
     - import_tasks: roles/aws/tasks/vpc.yaml
     - import_tasks: roles/aws/tasks/configfiles.yaml
     - import_tasks: roles/aws/tasks/configfiles_cns.yaml
-    #  when: ( deploy_ocs | bool ) and ( deploy_ocs is defined )
+      when: ( deploy_ocs | bool ) and ( deploy_ocs is defined )
+    - import_tasks: roles/aws/tasks/eip.yaml

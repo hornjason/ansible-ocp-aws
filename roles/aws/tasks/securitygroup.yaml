@@ -8,9 +8,12 @@
     region: "{{ aws_region }}"
     state: "{{ state | default('present') }}"
     vpc_id: "{{ vpc.vpc.id if (state is undefined or 'absent' not in state) else vpc.vpcs[0].vpc_id }}"
+  register: secgroup_results
+  until: secgroup_results is success
+  retries: 30
   when: ( vpc.vpc is defined ) or ( vpc.vpcs[0] is defined )
   with_items:
-    - name: "node"
     - name: "master"
     - name: "infra"
+    - name: "node"
     - name: "bastion"

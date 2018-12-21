@@ -9,3 +9,19 @@
   register: eipbastion
   when:
     - ( state is undefined ) or ( 'absent' not in state )
+
+- ec2_eip_facts:
+    region: "{{ aws_region }}"
+  register: eip_results
+
+- name: Remove EIPs
+  ec2_eip:
+    region: "{{ aws_region }}"
+    state: absent
+    ip: "{{ item.public_ip }}"
+  retries: 3
+  loop: "{{ eip_results.addresses }}"
+  when: 
+    - ( state is defined ) 
+    - ( 'absent'  in state )
+

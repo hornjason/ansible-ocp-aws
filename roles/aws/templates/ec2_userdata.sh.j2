@@ -48,10 +48,15 @@ runcmd:
 packages:
 {% if 'bastion' in item.name -%}
 {% for pkg in bastion_pkgs %}
-- {{ pkg }}
+  - {{ pkg }}
 {% endfor %}
 {% else -%}
-- lvm2
+  - lvm2
+  - wget
+  - net-tools
+  - bind-tools
+  - sos
+  - vim
 {% endif %}
 
 

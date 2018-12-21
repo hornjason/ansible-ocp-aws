@@ -4,18 +4,21 @@
     query: hosted_zone
   register: r53_zones
 
-- name: Filter Route53 zones
-  set_fact:
-    r53_zones: ['{% for zone in r53_zones.HostedZones -%}
-        {%- if clusterid ~ ".sysdeseng.com." in zone.Name -%}
-          {%- if zone.Config.PrivateZone == true -%}
-            { "Id": "{{ zone.Id | safe }}", "Name": "{{ zone.Name | safe }}", "PrivateZone": true },
-          {%- else -%}
-            { "Id": "{{ zone.Id | safe }}", "Name": "{{ zone.Name | safe }}" , "PrivateZone": false },
-          {%- endif -%}
-        {%- endif -%}
-      {% endfor -%}']
-  register: r53_zones
+#- name: Filter Route53 zones
+#  set_fact:
+#    r53_zoness: ['
+#      {% for zone in r53_zones.HostedZones -%}
+#          {%- if zone.Config.PrivateZone == true -%}
+#            { "Id": "{{ zone.Id }}", "Name": "{{ zone.Name }}", "PrivateZone": true },
+#          {%- else -%}
+#            { "Id": "{{ zone.Id }}", "Name": "{{ zone.Name }}" , "PrivateZone": false },
+#          {%- endif -%}
+#      {% endfor -%}']
+  #register: r53_zoness
+
+- debug: 
+    msg: "PRIV {{ item.Config.PrivateZone }}"
+  loop: "{{ r53_zones.HostedZones }}"
 
 - name: Gather Route53 record facts
   ignore_errors: True
@@ -28,21 +31,25 @@
   register: r53_record
   with_items:
     - private_zone: no
-      record: "{{ 'master' + '.' + clusterid + '.' + dns_domain }}"
+      #record: "{{ 'master' + '.' + clusterid + '.' + dns_domain }}"
+      record: "{{ master_lb_dns }}"
       type: 'CNAME'
       #zone: "{{ clusterid + '.' + dns_domain }}."
       zone: "{{ dns_domain }}."
     - private_zone: no
-      record: "*.apps.{{ clusterid }}.{{ dns_domain }}"
+      #record: "*.apps.{{ clusterid }}.{{ dns_domain }}"
+      record: "*.{{ router_lb_default_subdomain }}"
       type: 'CNAME'
       #zone: "{{ clusterid + '.' + dns_domain }}."
       zone: "{{ dns_domain }}."
     - private_zone: yes
-      record: "{{ 'master' + '.' + clusterid + '.' + dns_domain }}"
+      record: "{{ master_lb_dns }}"
+      #record: "{{ 'master' + '.' + clusterid + '.' + dns_domain }}"
       #zone: "{{ clusterid + '.' + dns_domain }}."
       zone: "{{ dns_domain }}."
     - private_zone: yes
-      record: "*.apps.{{ clusterid }}.{{ dns_domain }}"
+      #record: "*.apps.{{ clusterid }}.{{ dns_domain }}"
+      record: "*.{{ router_lb_default_subdomain }}"
       type: 'CNAME'
       #zone: "{{ clusterid + '.' + dns_domain }}."
       zone: "{{ dns_domain }}."
@@ -94,7 +101,7 @@
       tag:Name: "{{ clusterid }}"
     region: "{{ aws_region }}"
   register: vpc
-
+- debug: var=vpc
 - name: Gather NatGW facts
   ec2_vpc_nat_gateway_facts:
     filters: "{{ {
